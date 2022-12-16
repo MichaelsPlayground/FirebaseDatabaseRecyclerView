@@ -1,0 +1,74 @@
+package de.androidcrypto.firebaseplayground;
+
+import android.graphics.drawable.GradientDrawable;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import java.text.SimpleDateFormat;
+
+import de.androidcrypto.firebaseplayground.models.MessageModel;
+
+public class DatabaseMessageViewHolder extends RecyclerView.ViewHolder{
+
+    TextView mMessageField;
+    TextView mTimeField;
+    private final RelativeLayout mMessageContainer;
+    private final LinearLayout mMessageLayout;
+    private final int mGreen300;
+    private final int mGray300;
+
+    public DatabaseMessageViewHolder(@NonNull View itemView) {
+        super(itemView);
+        mMessageField = itemView.findViewById(R.id.database_chat_message_message); // will be shown
+        mTimeField = itemView.findViewById(R.id.database_chat_message_time); // will be shown
+        mMessageContainer = itemView.findViewById(R.id.database_chat_message_container);
+        mMessageLayout = itemView.findViewById(R.id.database_chat_message_layout);
+        mGreen300 = ContextCompat.getColor(itemView.getContext(), R.color.material_green_300);
+        mGray300 = ContextCompat.getColor(itemView.getContext(), R.color.material_gray_300);
+    }
+
+    public void bind(@NonNull MessageModel message) {
+        //setName(message.getName());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yy HH:mm:ss");
+        String messageTime = dateFormat.format(message.getMessageTime());
+        setTime(messageTime);
+        setMessage(message.getMessage());
+
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        //setIsSender(currentUser != null && message.getUid().equals(currentUser.getUid()));
+        setIsSender(currentUser != null && message.getSenderId().equals(currentUser.getUid()));
+    }
+
+
+    private void setTime(@Nullable String timeString) {
+        mTimeField.setText(timeString);
+    }
+
+    private void setMessage(@Nullable String messageString) {
+        mMessageField.setText(messageString);
+    }
+
+    private void setIsSender(boolean isSender) {
+        final int color;
+        if (isSender) {
+            color = mGreen300;
+            mMessageContainer.setGravity(Gravity.END);
+        } else {
+            color = mGray300;
+            mMessageContainer.setGravity(Gravity.START);
+        }
+
+        ((GradientDrawable) mMessageLayout.getBackground()).setColor(color);
+    }
+}

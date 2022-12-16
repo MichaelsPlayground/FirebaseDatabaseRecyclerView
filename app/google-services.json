@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1019673864578",
+    "project_id": "fir-playground-1856e",
+    "storage_bucket": "fir-playground-1856e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1019673864578:android:f295f06edeb989403e479b",
+        "android_client_info": {
+          "package_name": "de.androidcrypto.firebaseplayground"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1019673864578-2r72id6khkq18acr91mgbfrv4rola44t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "de.androidcrypto.firebaseplayground",
+            "certificate_hash": "1922a4d701a83d098f0493e98e21922d5a5fb054"
+          }
+        },
+        {
+          "client_id": "1019673864578-ibeh6va2am1fn8eppar1u8rngbn23lmd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBynJhOpDj-v6tpqUCa7PalcDDwKaasFF0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1019673864578-ibeh6va2am1fn8eppar1u8rngbn23lmd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

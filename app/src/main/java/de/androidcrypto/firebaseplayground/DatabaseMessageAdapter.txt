@@ -1,0 +1,42 @@
+package de.androidcrypto.firebaseplayground;
+
+import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import de.androidcrypto.firebaseplayground.DatabaseMessageViewHolder;
+
+import java.util.List;
+
+public class DatabaseMessageAdapter extends RecyclerView.Adapter<DatabaseMessageViewHolder>{
+
+    private List<DatabaseMessageViewHolder> messageList;
+    private DatabaseReference chatRef;
+    private FirebaseAuth mAuth;
+    public DatabaseMessageAdapter (List<DatabaseMessageViewHolder> messageList)
+    {
+        this.messageList = messageList;
+    }
+
+
+    @NonNull
+    @Override
+    public DatabaseMessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        return null;
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull DatabaseMessageViewHolder holder, int position) {
+
+    }
+
+
+
+    @Override
+    public int getItemCount() {
+        return 0;
+    }
+}
