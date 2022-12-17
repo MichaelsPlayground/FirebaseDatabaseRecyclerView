@@ -2,7 +2,11 @@ package de.androidcrypto.firebaseplayground;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+import android.widget.AbsListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +25,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +48,7 @@ public class ChatDatabaseRecyclerViewPaginatedActivity extends AppCompatActivity
     RecyclerView recyclerView;
     com.google.android.material.textfield.TextInputEditText edtMessage;
     com.google.android.material.textfield.TextInputLayout edtMessageLayout;
+    ProgressBar progressBar;
 
     private static String authUserId = "", authUserEmail = "", authDisplayName = "";
     private static String receiveUserId = "", receiveUserEmail = "", receiveUserDisplayName = "";
@@ -52,9 +58,13 @@ public class ChatDatabaseRecyclerViewPaginatedActivity extends AppCompatActivity
     private DatabaseReference mDatabaseReference; // general database reference
     private DatabaseReference mMessagesRef; // messages in messages/roomId
     private Query mMessagesQuery; // query on e.g. last 10 messages
-    int ITEM_LOAD_COUNT= 10;
+    int ITEM_LOAD_COUNT = 10;
+    String last_key = "", last_node = "";
+    boolean isMaxData = false, isScrolling = false;
+    int currentItems, tottalItems, scrolledoutItems;
+    LinearLayoutManager layoutManager;
 
-    List<MessageModel > messageList;
+    List<MessageModel> messageList;
     DatabaseMessageAdapter mDatabaseMessageAdapter;
 
     @Override
@@ -66,6 +76,7 @@ public class ChatDatabaseRecyclerViewPaginatedActivity extends AppCompatActivity
         recyclerView = findViewById(R.id.rvChatDatabase);
         edtMessageLayout = findViewById(R.id.etChatDatabaseMessageLayout);
         edtMessage = findViewById(R.id.etChatDatabaseMessage);
+        progressBar = findViewById(R.id.pbChatDatabase);
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -76,6 +87,9 @@ public class ChatDatabaseRecyclerViewPaginatedActivity extends AppCompatActivity
         // the mMessagesRef is set when the own user is signed in and a chat partner is given
         // this is done with the method setMMessagesRef(authUserId, receiveUserId);
         // here called from setDatabaseForRoomId
+
+        //getLastKeyFromFirebase();
+        layoutManager = new LinearLayoutManager(getApplicationContext());
 
         messageList = new ArrayList<>();
         recyclerView.setHasFixedSize(true);
@@ -89,24 +103,117 @@ public class ChatDatabaseRecyclerViewPaginatedActivity extends AppCompatActivity
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
+
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                    isScrolling = true;
+                }
+
             }
 
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
-                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                int lastCompletelyVisibleItemPosition = linearLayoutManager.findLastCompletelyVisibleItemPosition();
-                System.out.println("lastCompletelyVisibleItemPosition: " + lastCompletelyVisibleItemPosition);
-                if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == messageList.size() - 1) {
-                    // bottom of list!
-                    System.out.println("** scroll down, loading more");
-                    //loadMore();
-                    //isLoading = true;
-                }
+                currentItems = layoutManager.getChildCount();
+                tottalItems = layoutManager.getItemCount();
+                scrolledoutItems = layoutManager.findFirstVisibleItemPosition();
 
+                if (isScrolling && currentItems + scrolledoutItems == tottalItems) {
+                    //  Toast.makeText(getContext(), "fetch data", Toast.LENGTH_SHORT).show();
+                    isScrolling = false;
+                    //fetch data
+                    progressBar.setVisibility(View.VISIBLE);
+                    getMessages();
+                }
             }
         });
+
+    }
+
+    private void getMessages() {
+        if (!isMaxData) // 1st fasle
+        {
+            Query query;
+
+            if (TextUtils.isEmpty(last_node))
+                query = mDatabaseReference
+                        .child(NODE_DATABASE_MESSAGES)
+                        .child(roomId)
+                        .orderByKey()
+                        .limitToFirst(ITEM_LOAD_COUNT);
+            else
+                query = mDatabaseReference
+                        .child(NODE_DATABASE_MESSAGES)
+                        .child(roomId)
+                        .orderByKey()
+                        .startAt(last_node)
+                        .limitToFirst(ITEM_LOAD_COUNT);
+
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.hasChildren()) {
+
+                        List<MessageModel> newMessages = new ArrayList<>();
+                        List<String> newMessagesIds = new ArrayList<>(); // get the message keys
+                        for (DataSnapshot messageSnapshot : snapshot.getChildren()) {
+                            newMessages.add(messageSnapshot.getValue(MessageModel.class));
+                            newMessagesIds.add(messageSnapshot.getKey());
+                        }
+
+                        //last_node = newMessages.get(newMessages.size() - 1).getId();    // 10  if it greater than the total items set to visible then fetch data from server
+                        last_node = newMessagesIds.get(newMessages.size() - 1);    // 10  if it greater than the total items set to visible then fetch data from server
+
+                        if (!last_node.equals(last_key))
+                            newMessages.remove(newMessages.size() - 1);    // 19,19 so to remove duplicate remove one value
+                        else
+                            last_node = "end";
+
+                        Toast.makeText(getApplicationContext(), "last_node " + last_node, Toast.LENGTH_SHORT).show();
+
+                        mDatabaseMessageAdapter.addAll(newMessages);
+                        mDatabaseMessageAdapter.notifyDataSetChanged();
+                    } else   //reach to end no further child available to show
+                    {
+                        isMaxData = true;
+                    }
+                    progressBar.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        } else {
+            progressBar.setVisibility(View.GONE); //if data end
+        }
+    }
+
+    private void getLastKeyFromFirebase() {
+        Log.i(TAG, "getLastKeyFromFirebase");
+        Query getLastKey = mDatabaseReference
+                .child(NODE_DATABASE_MESSAGES)
+                .child(roomId)
+                .orderByKey()
+                .limitToLast(1);
+
+        getLastKey.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot lastkey : snapshot.getChildren())
+                    last_key = lastkey.getKey();
+                Log.i(TAG, "lastKey: " + last_key);
+                Toast.makeText(getApplicationContext(), "last_key" + last_key, Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getApplicationContext(), "can not get last key", Toast.LENGTH_SHORT).show();
+            }
+        });
+
 
     }
 
@@ -115,9 +222,11 @@ public class ChatDatabaseRecyclerViewPaginatedActivity extends AppCompatActivity
         roomId = getRoomId(chatOwnUid, chatPartnerUid);
         Log.i(TAG, "room Id is " + roomId);
         mMessagesRef = mDatabaseReference.child(NODE_DATABASE_MESSAGES).child(roomId);
-        recentPostsQuery(ITEM_LOAD_COUNT);
+        //recentPostsQuery(ITEM_LOAD_COUNT);
+        getLastKeyFromFirebase();
     }
 
+    /*
     private void recentPostsQuery(int numberPosts) {
         // Last numberPosts posts, these are automatically the numberPosts most recent
         // due to sorting by push() keys
@@ -151,18 +260,6 @@ public class ChatDatabaseRecyclerViewPaginatedActivity extends AppCompatActivity
 
 
                 // scroll down to last message
-/*
-                mDatabaseMessageAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-                    @Override
-                    public void onItemRangeInserted(int positionStart, int itemCount) {
-                        //mBinding.messagesList.smoothScrollToPosition(adapter.getItemCount());
-                        recyclerView.smoothScrollToPosition(mDatabaseMessageAdapter.getItemCount());
-                        //recyclerView.scrollToPosition(mDatabaseMessageAdapter.getItemCount());
-                    }
-                });
-*/
-
-
                 // ...
             }
 
@@ -211,6 +308,7 @@ public class ChatDatabaseRecyclerViewPaginatedActivity extends AppCompatActivity
         mMessagesQuery.addChildEventListener(childEventListener);
         // [END child_event_listener_recycler]
     }
+     */
 
     /**
      * service methods

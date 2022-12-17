@@ -36,6 +36,14 @@ public class DatabaseMessageAdapter extends RecyclerView.Adapter<DatabaseMessage
         this.mMessageList = messageList;
     }
 
+    // new for pagination
+    public void addAll(List<MessageModel> newMessages)
+    {
+        int initSize = mMessageList.size();
+        mMessageList.addAll(newMessages);
+        notifyItemRangeChanged(initSize, newMessages.size());
+    }
+
     @NonNull
     @Override
     public DatabaseMessageHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

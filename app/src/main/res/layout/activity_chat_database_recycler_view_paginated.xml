@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/chatFirestoreMessageLayout"
-    tools:context=".ChatDatabaseRecyclerViewActivity">
+    android:id="@+id/chatFirebaseMessageLayout"
+    tools:context=".ChatDatabaseRecyclerViewPaginatedActivity">
 
     <TextView
         android:id="@+id/tvChatDatabaseHeader"
@@ -30,10 +30,23 @@
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/etChatDatabaseMessageLayout"
+        app:layout_constraintBottom_toTopOf="@+id/pbChatDatabase"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvChatDatabaseHeader" />
+
+    <ProgressBar
+        android:id="@+id/pbChatDatabase"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/etChatDatabaseMessageLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rvChatDatabase"
+        />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/etChatDatabaseMessageLayout"
