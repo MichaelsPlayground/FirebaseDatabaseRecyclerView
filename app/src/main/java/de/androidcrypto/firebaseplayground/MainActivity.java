@@ -108,6 +108,17 @@ public class MainActivity extends AppCompatActivity {
                 //finish();
             }
         });
+
+        Button chatDatabaseRecyclerViewPaginated3 = findViewById(R.id.btnMainDatabaseChatRecyclerViewPaginated3);
+        chatDatabaseRecyclerViewPaginated3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.i(TAG, "chat in database with Paginated 3 RecyclerView");
+                Intent intent = new Intent(MainActivity.this, ChatDatabaseRecyclerViewPaginated3Activity.class);
+                startActivity(intent);
+                //finish();
+            }
+        });
     }
 
     @Override
