@@ -85,6 +85,10 @@ public class ChatDatabaseRecyclerViewPaginated3Activity extends AppCompatActivit
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(manager);
+        // will add a line between the entries
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                manager.getOrientation());
+        recyclerView.addItemDecoration(dividerItemDecoration);
         getMessages();
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener()
         {

@@ -39,12 +39,15 @@ public class NewAdapter extends RecyclerView.Adapter<NewAdapter.NewViewHolder>{
     public static class NewViewHolder extends RecyclerView.ViewHolder
     {
         TextView name;
+        TextView email;
+        TextView messageTime;
 
         public NewViewHolder(@NonNull View itemView)
         {
             super(itemView);
-            name=itemView.findViewById(R.id.user_name_iv);
-
+            name = itemView.findViewById(R.id.user_name_iv);
+            email = itemView.findViewById(R.id.email);
+            messageTime = itemView.findViewById(R.id.provider);
         }
     }
 
@@ -60,6 +63,8 @@ public class NewAdapter extends RecyclerView.Adapter<NewAdapter.NewViewHolder>{
     public void onBindViewHolder(@NonNull NewViewHolder holder, int position)
     {
         holder.name.setText(messagesList.get(position).getMessage());
+        holder.email.setText(messagesList.get(position).getSenderId());
+        holder.messageTime.setText(messagesList.get(position).getMessageTimeString());
     }
 
     @Override
