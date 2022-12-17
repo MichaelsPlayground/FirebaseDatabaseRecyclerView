@@ -138,6 +138,13 @@ public class ChatDatabaseRecyclerViewPaginated2Activity extends AppCompatActivit
                     userModels.add(user);
                     Log.i(TAG, "onDataChange: " + userSnapshot.getValue(Message2Model.class).getMessage());
                 }
+                String lastNode = userModels.get(userModels.size() - 1).getKey();
+                Log.i(TAG, "nodeId: " + nodeId + " lastNode: " + lastNode);
+                if (!lastNode.equals(nodeId))
+                    userModels.remove(userModels.size() - 1);    // 19,19 so to remove duplicate remove one value
+                else {
+                    lastNode = "end";
+                }
 
                 mAdapter.addAll(userModels);
                 mIsLoading = false;
