@@ -9,14 +9,12 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,7 +27,7 @@ import java.util.List;
 
 import de.androidcrypto.firebaseplayground.models.Message2Model;
 
-public class ChatDatabaseRecyclerViewPaginated3Activity extends AppCompatActivity {
+public class ChatDatabaseRecyclerViewPaginated3WorkingActivity extends AppCompatActivity {
 
     // https://dpkpradhan649.medium.com/firebase-realtime-database-pagination-in-recyclerview-c3f9a4a7856f
     // funktioniert hat aber keine Live-Updates
@@ -190,49 +188,6 @@ public class ChatDatabaseRecyclerViewPaginated3Activity extends AppCompatActivit
                 @Override
                 public void onCancelled(@NonNull DatabaseError error)
                 {
-
-                }
-
-
-            });
-
-            Query queryChild = mMessagesRef
-                    .orderByKey()
-                    .limitToLast(1);
-            // this is an additional listener for added elements
-            queryChild.addChildEventListener(new ChildEventListener() {
-                @Override
-                public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    Log.i(TAG, "query.addChildEventListener onChildAdded");
-                    Message2Model message2Model = snapshot.getValue(Message2Model.class);
-                    String keyListener = snapshot.getKey();
-                    Log.i(TAG, "m2m key: " + keyListener);
-                    Log.i(TAG, "m2m: " + message2Model.getMessage());
-                    if (keyListener.equals(lastKey)) {
-                        Log.i(TAG, "key equals lastKey");
-                    } else {
-                        int compare = keyListener.compareTo(lastKey);
-                        Log.i(TAG, "keyListener: " + keyListener + " lastKey: " + lastKey + " compare: " + compare);
-                    }
-                }
-
-                @Override
-                public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    Log.i(TAG, "query.addChildEventListener onChildChanged");
-                }
-
-                @Override
-                public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-                    Log.i(TAG, "query.addChildEventListener onChildRemoved");
-                }
-
-                @Override
-                public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                    Log.i(TAG, "query.addChildEventListener onChildMoved");
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
 
                 }
             });
