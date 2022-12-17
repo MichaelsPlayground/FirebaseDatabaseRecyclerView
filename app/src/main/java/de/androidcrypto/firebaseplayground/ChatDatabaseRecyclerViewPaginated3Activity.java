@@ -34,6 +34,8 @@ public class ChatDatabaseRecyclerViewPaginated3Activity extends AppCompatActivit
     // https://dpkpradhan649.medium.com/firebase-realtime-database-pagination-in-recyclerview-c3f9a4a7856f
     // funktioniert hat aber keine Live-Updates
 
+    // todo reverse view, show LAST 10 entries
+
     private static final String TAG = "ChatDbRecyclViewPag3";
     // my database is not in default/US location so you need to fill in the reference here
     private static final String DATABASE_REFERENCE = "https://fir-playground-1856e-default-rtdb.europe-west1.firebasedatabase.app";
@@ -196,10 +198,10 @@ public class ChatDatabaseRecyclerViewPaginated3Activity extends AppCompatActivit
 
             });
 
+            // this is an additional listener for added elements
             Query queryChild = mMessagesRef
                     .orderByKey()
                     .limitToLast(1);
-            // this is an additional listener for added elements
             queryChild.addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
@@ -213,6 +215,19 @@ public class ChatDatabaseRecyclerViewPaginated3Activity extends AppCompatActivit
                     } else {
                         int compare = keyListener.compareTo(lastKey);
                         Log.i(TAG, "keyListener: " + keyListener + " lastKey: " + lastKey + " compare: " + compare);
+                        if (TextUtils.isEmpty(lastKey)) {
+                            // this means it is the initial run, so we do not need to run any action
+                            Log.i(TAG, "query.addChildEventListener onChildAdded - lastKey is empty");
+                        } else {
+                            // we need to check if the keyListener is larger than lastKey
+                            Log.i(TAG, "checking if keyListener is larger than lastKey...");
+                            if (compare > 0) {
+                                Log.i(TAG, "compare > 0, starting a new query");
+                                // todo work here
+                                //getMessages();
+                            }
+                        }
+
                     }
                 }
 
