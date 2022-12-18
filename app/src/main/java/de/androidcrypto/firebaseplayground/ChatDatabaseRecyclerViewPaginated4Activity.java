@@ -41,6 +41,10 @@ public class ChatDatabaseRecyclerViewPaginated4Activity extends AppCompatActivit
 
     // part 31 of tutorial
     // https://www.youtube.com/watch?v=_oWADTT8zHQ
+    // https://github.com/Akil1470/Lapit---Android-Firebase-Chat-App (not original one, was deleted)
+
+    // see also: https://blog.shreyaspatil.dev/firebase-database-paging-android-f59e6dd0dc75
+    // https://github.com/PatilShreyas/FirebaseRecyclerPagination
 
     // todo reverse view, show LAST 10 entries
 
